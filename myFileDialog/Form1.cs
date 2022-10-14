@@ -1,10 +1,13 @@
-﻿using myFileDialogDll.UI;
+﻿using myFileDialogDll.Manager;
+using myFileDialogDll.Manager.Factorys;
+using myFileDialogDll.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -22,7 +25,12 @@ namespace myFileDialog
         private void button1_Click(object sender, EventArgs e)
         {
             openDirectoryDialog openDirectoryDialog = new openDirectoryDialog();
+            openDirectoryDialog.InitPath = Path.Combine(Directory.GetCurrentDirectory(), "根目录");
+            Directory.CreateDirectory(openDirectoryDialog.InitPath);
             openDirectoryDialog.ShowDialog();
+            //FolderBrowserDialog fbd = new FolderBrowserDialog();
+            ////FolderNameEditor folderBrowserDialog1 = new FolderNameEditor();
+            //fbd.ShowDialog(this);
         }
 
         private void uiTreeView1_Click(object sender, EventArgs e)
@@ -74,6 +82,43 @@ namespace myFileDialog
             e.Graphics.DrawImage((e.Node.IsExpanded ? imageList1.Images[0] : imageList1.Images[1]), e.Bounds.Location.X + 5, e.Bounds.Location.Y + 3);
             //绘制文字
             e.Graphics.DrawString(e.Node.Text, nodeFont, Brushes.Black, (e.Bounds.Location.X + 20), (e.Bounds.Location.Y));
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            openFileDialog openFileDialog = new openFileDialog();
+            openFileDialog.InitPath = Path.Combine(Directory.GetCurrentDirectory(), "根目录");
+            openFileDialog.Filter = "(*.txt) | *.txt";
+            openFileDialog.IsMultSelect = false;
+            openFileDialog.ShowDialog();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog ofd = new OpenFileDialog())
+            {
+                ofd.Multiselect = true;
+                ofd.InitialDirectory = Environment.CurrentDirectory;
+                ofd.Filter = "(*.txt) | *.txt";
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    string path = ofd.FileName;
+                }
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            MyFileManager.GetInstance().ReSetFactory(new DialogFilesFactory());
+            MyFileManager.GetInstance().ProjectName = "Test";
+            string sPath = MyFileManager.GetInstance().GetDirPath("(*.txt) | *.txt");
+            Console.WriteLine(sPath);
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            string sPath = MyFileManager.GetInstance().GetFileFullName("(*.txt) | *.txt");
+            Console.WriteLine(sPath);
         }
     }
 }
